@@ -146,7 +146,7 @@ zone "$OCTR21.in-addr.arpa" {
 EOF
 
 cat << EOF > /etc/bind/zones/$DOMAIN
-$TTL    604800
+\$TTL    604800
 @       IN      SOA     ns.$DOMAIN. root.ns.$DOMAIN. (
                               3         ; Serial
                          604800         ; Refresh
@@ -168,7 +168,7 @@ EOF
 OCTR43=`echo $IP | awk -F'.' '{print $4, $3}'`
 
 cat << EOF > /etc/bind/zones/$DOMAIN.reverse
-$TTL    604800
+\$TTL    604800
 @       IN      SOA     $DOMAIN. root.$DOMAIN. (
                               3         ; Serial
                          604800         ; Refresh
