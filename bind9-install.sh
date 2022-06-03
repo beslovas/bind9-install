@@ -87,6 +87,17 @@ setup_bind9()
             sed -i 's/OPTIONS=.*/OPTIONS="-4 -u bind"/' /etc/default/bind9
             ;;
     esac
+
+    [[ ! -d /etc/bind/zones ]] && mkdir /etc/bind/zones
+
+    cat << EOF > /etc/bind/named.conf.options
+options {
+    directory "/var/cache/bind";
+    recursion yes;
+    listen-on { localhost; };
+    forwarders { 8.8.8.8; 8.8.4.4; };
+};
+EOF
 }
 setup_bind9
 
@@ -103,24 +114,29 @@ restart_bind9()
 }
 restart_bind9
 
-cat << EOF > /etc/bind/named.conf.options
-options {
-    directory "/var/cache/bind";
-    recursion yes;
-    listen-on { localhost; };
-    allow-transfer { none; };
-    forwarders { 8.8.8.8; 8.8.4.4; };
-};
-EOF
-
 IP=`ip -o route get to 8.8.8.8 | sed -n 's/.*src \([0-9.]\+\).*/\1/p'`
 
 OCTR21=`echo $IP | awk -F'.' '{print $2,$1}' OFS='.'`
 
+KEY_SECRET=$(echo `echo $RANDOM | md5sum | head -c 24` | base64)
+
+
+cat << EOF > /etc/bind/zones/$DOMAIN.key
+key $DOMAIN. {
+    algorithm hmac-md5;
+    secret "$KEY_SECRET";
+};
+EOF
+
 cat << EOF > /etc/bind/named.conf.local
+include "/etc/bind/zones/$DOMAIN.key";
+
 zone "$DOMAIN" {
     type master;
-    file "/etc/bind/zones/$DOMAIN.forward";
+    update-policy {
+        grant $DOMAIN zonesub any;
+    };
+    file "/etc/bind/zones/$DOMAIN";
 };
 
 zone "$OCTR21.in-addr.arpa" {
@@ -129,9 +145,7 @@ zone "$OCTR21.in-addr.arpa" {
 };
 EOF
 
-mkdir /etc/bind/zones
-
-cat << EOF > /etc/bind/zones/$DOMAIN.forward
+cat << EOF > /etc/bind/zones/$DOMAIN
 $TTL    604800
 @       IN      SOA     ns.$DOMAIN. root.ns.$DOMAIN. (
                               3         ; Serial
