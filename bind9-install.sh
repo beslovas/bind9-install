@@ -46,7 +46,8 @@ DISTRO=""
 get_distro()
 {
     if [[ -e /etc/debian_version ]]; then
-        DISTRO="debian"
+        VERSION=`cat /etc/debian_version | awk -F'.' '{print $1}'`
+        [[ $VERSION -ge 10 ]] && DISTRO="debian" || DISTRO="debian-old"
     fi
 
     if [[ -e /etc/lsb-release ]]; then
@@ -75,22 +76,20 @@ get_distro()
 }
 get_distro
 
-if [[ $DISTRO != "ubuntu" && $DISTRO != "debian" ]]; then
+if [[ $DISTRO != @("ubuntu"|"debian"|"debian-old") ]]; then
     echo "Only ubuntu and debian distros are currently supported"
     exit 1
 fi
 
 setup_bind9()
 {
-
-
     case "$DISTRO" in
-        "debian" )
+        "debian-old" )
             apt -y update && apt -y install bind9 bind9utils procps resolvconf
             sed -i 's/OPTIONS=.*/OPTIONS="-u bind -4"/' /etc/default/named
             systemctl enable --now named-resolvconf
             ;;
-        "ubuntu" )
+        "ubuntu"|debian )
             apt -y update && apt -y install bind9 bind9utils iproute2 resolvconf
             sed -i 's/OPTIONS=.*/OPTIONS="-4 -u bind"/' /etc/default/bind9
             systemctl enable --now bind9-resolvconf
