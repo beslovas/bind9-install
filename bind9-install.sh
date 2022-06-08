@@ -214,4 +214,4 @@ search $DOMAIN
 EOF
 }
 
-[[ -n $OMIT_RESOLVCONF ]] && replace_resolv_conf()
+[[ -n $OMIT_RESOLVCONF ]] && replace_resolv_conf
