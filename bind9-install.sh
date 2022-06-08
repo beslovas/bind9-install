@@ -86,12 +86,12 @@ setup_bind9()
 
     case "$DISTRO" in
         "debian" )
-            apt -y update && apt -y install bind9 bind9utils procps
+            apt -y update && apt -y install bind9 bind9utils procps resolvconf
             sed -i 's/OPTIONS=.*/OPTIONS="-u bind -4"/' /etc/default/named
             systemctl enable --now named-resolvconf
             ;;
         "ubuntu" )
-            apt -y update && apt -y install bind9 bind9utils iproute2
+            apt -y update && apt -y install bind9 bind9utils iproute2 resolvconf
             sed -i 's/OPTIONS=.*/OPTIONS="-4 -u bind"/' /etc/default/bind9
             systemctl enable --now bind9-resolvconf
             ;;
