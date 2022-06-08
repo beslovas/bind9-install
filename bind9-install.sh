@@ -88,10 +88,12 @@ setup_bind9()
         "debian" )
             apt -y update && apt -y install bind9 bind9utils procps
             sed -i 's/OPTIONS=.*/OPTIONS="-u bind -4"/' /etc/default/named
+            systemctl enable --now named-resolvconf
             ;;
         "ubuntu" )
             apt -y update && apt -y install bind9 bind9utils iproute2
             sed -i 's/OPTIONS=.*/OPTIONS="-4 -u bind"/' /etc/default/bind9
+            systemctl enable --now bind9-resolvconf
             ;;
     esac
 
@@ -163,16 +165,8 @@ cat << EOF > $ZONES_PATH/$DOMAIN
                          604800 )       ; Negative Cache TTL
 ; name servers - NS records
 @     IN      NS      ns.$DOMAIN.
-
-; name servers - A records
 ns    IN      A       $IP
-
-; A records
 EOF
-
-# insert A records for forward zone
-# host1.$DOMAIN.com.     IN      A      10.1.1.101
-# ...
 
 OCTR43=`echo $IP | awk -F'.' '{print $4, $3}'`
 
@@ -189,13 +183,7 @@ cat << EOF > $ZONES_PATH/$DOMAIN.reverse
 
 ; PTR for DNS Server
 $OCTR43  IN      PTR     ns.$DOMAIN.
-
-; PTR Records
 EOF
-
-# insert PTR records for reverse zone
-# 101.1 IN      PTR     host1.$DOMAIN.com.  ; 10.1.1.101
-# ...
 
 restart_bind9
 
