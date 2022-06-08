@@ -86,7 +86,7 @@ setup_bind9()
             systemctl enable --now named-resolvconf
             ;;
         "ubuntu"|"debian" )
-            apt -y update && apt -y install bind9 bind9-dnsutils bin iproute2 resolvconf
+            apt -y update && apt -y install bind9 bind9-dnsutils iproute2 resolvconf
             sed -i 's/OPTIONS=.*/OPTIONS="-4 -u bind"/' /etc/default/bind9
             systemctl enable --now bind9-resolvconf
             ;;
