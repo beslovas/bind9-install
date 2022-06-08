@@ -82,6 +82,8 @@ fi
 
 setup_bind9()
 {
+
+
     case "$DISTRO" in
         "debian" )
             apt -y update && apt -y install bind9 bind9utils procps
@@ -93,7 +95,7 @@ setup_bind9()
             ;;
     esac
 
-    [[ ! -d "$ZONES_PATH" ]] && mkdir "$ZONES_PATH"
+    [[ ! -d "$ZONES_PATH" ]] && mkdir $ZONES_PATH && chown bind:bind $ZONES_PATH
 
     cat << EOF > /etc/bind/named.conf.options
 options {
