@@ -89,7 +89,7 @@ setup_bind9()
             sed -i 's/OPTIONS=.*/OPTIONS="-u bind -4"/' /etc/default/named
             systemctl enable --now named-resolvconf
             ;;
-        "ubuntu"|debian )
+        "ubuntu"|"debian" )
             apt -y update && apt -y install bind9 bind9utils iproute2 resolvconf
             sed -i 's/OPTIONS=.*/OPTIONS="-4 -u bind"/' /etc/default/bind9
             systemctl enable --now bind9-resolvconf
@@ -112,10 +112,10 @@ setup_bind9
 restart_bind9()
 {
     case "$DISTRO" in
-        "debian" )
+        "debian-old" )
             service named restart
             ;;
-        "ubuntu" )
+        "ubuntu"|"debian" )
             service bind9 restart
             ;;
     esac
