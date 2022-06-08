@@ -93,7 +93,7 @@ setup_bind9()
             ;;
     esac
 
-    [[ ! -d /etc/bind/zones ]] && mkdir /etc/bind/zones
+    [[ ! -d "$ZONES_PATH/zones"]] && mkdir "$ZONES_PATH/zones"
 
     cat << EOF > /etc/bind/named.conf.options
 options {
