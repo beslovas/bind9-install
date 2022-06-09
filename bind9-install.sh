@@ -180,4 +180,6 @@ cat << EOF > $ZONES_PATH/$DOMAIN.reverse
 $OCTR43  IN      PTR     ns.$DOMAIN.
 EOF
 
+chown -R bind:bind $ZONES_PATH
+
 restart_bind9
